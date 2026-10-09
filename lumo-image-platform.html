@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lumo – Discover, save and tag images</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2fb;--sf:#fff;--ink:#1c1840;--mute:#6b6890;--line:#e4e0f4;--acc:#6a4cf5;--acc2:#ff6b8b;--sh:0 14px 34px -14px rgba(40,20,120,.35)}
+[data-theme=dark]{--bg:#12102a;--sf:#1c1a3a;--ink:#f0eefc;--mute:#9d9bc4;--line:#2e2b57;--sh:0 14px 34px -14px rgba(0,0,0,.6)}
+*{box-sizing:border-box;margin:0}
+body{font:400 15px/1.5 Figtree,system-ui,sans-serif;background:var(--bg);color:var(--ink);transition:background .3s}
+button,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+h1,h2,h3,.logo{font-family:'Bricolage Grotesque',sans-serif}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:12px clamp(14px,3vw,32px);background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:22px}
+.logo b{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2))}
+#sf{flex:1;display:flex;align-items:center;gap:10px;max-width:640px;margin:0 auto;padding:0 16px;height:44px;border-radius:99px;background:var(--sf);border:1px solid var(--line);transition:.25s}
+#sf:focus-within{border-color:var(--acc);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 18%,transparent)}
+#q{flex:1;border:0;background:none;outline:0;min-width:0}
+.nav{display:flex;gap:6px}
+.ib{display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:99px;font-weight:600;transition:.2s}
+.ib:hover,.ib.on{background:var(--sf);box-shadow:var(--sh)}
+#hero{position:relative;overflow:hidden;text-align:center;padding:clamp(40px,8vw,84px) 20px 28px}
+#hero h1{position:relative;font-size:clamp(34px,6vw,64px);line-height:1.05;font-weight:800;letter-spacing:-.03em;animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+#hero p{position:relative;margin:14px auto 0;max-width:46ch;color:var(--mute);animation:rise .9s .15s cubic-bezier(.2,.8,.2,1) both}
+.note{position:relative;display:inline-block;margin-top:18px;padding:6px 14px;border-radius:99px;font-size:13px;background:var(--sf);border:1px solid var(--line);color:var(--mute)}
+.orb{position:absolute;width:340px;height:340px;border-radius:50%;filter:blur(70px);opacity:.4;animation:float 14s ease-in-out infinite}
+.o1{background:var(--acc);left:8%;top:-120px}.o2{background:var(--acc2);right:6%;top:-60px;animation-delay:-6s}
+@keyframes float{50%{transform:translate(40px,30px) scale(1.15)}}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}}
+#cats{display:flex;gap:8px;overflow-x:auto;padding:8px clamp(14px,3vw,32px) 18px;scrollbar-width:none}
+#cats button{flex:none;padding:8px 18px;border-radius:99px;background:var(--sf);border:1px solid var(--line);font-weight:500;transition:.2s}
+#cats button:hover{transform:translateY(-2px)}
+#cats button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+main{padding:0 clamp(14px,3vw,32px) 60px}
+.grid{display:flex;gap:16px;align-items:flex-start}.col{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
+.pin{position:relative;border-radius:20px;overflow:hidden;cursor:zoom-in;background:linear-gradient(100deg,var(--line) 30%,var(--sf) 50%,var(--line) 70%) 0 0/300% 100%;animation:shine 1.4s infinite linear}
+@keyframes shine{to{background-position:-300% 0}}
+.pin img{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity .6s,transform .8s cubic-bezier(.2,.8,.2,1)}
+.pin img.on{opacity:1;transform:none}.pin:has(img.on){animation:none}
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:12px;opacity:0;transition:opacity .25s;background:linear-gradient(#0006,transparent 35%,transparent 60%,#0008);color:#fff}
+.pin:hover .ov,.pin:focus-within .ov{opacity:1}
+.ov .sv{align-self:flex-end}
+.row{display:flex;align-items:center;gap:8px}.by{flex:1;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rb{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#fff;color:#1c1840;transition:transform .2s}.rb:hover{transform:scale(1.12)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:99px;font-weight:600;background:var(--acc);color:#fff;transition:.2s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}.btn:disabled{opacity:.6;cursor:wait}
+.btn.ghost{background:var(--sf);color:var(--ink);border:1px solid var(--line)}
+.btn.ai{background:linear-gradient(135deg,var(--acc),var(--acc2))}
+@media(hover:none){.ov{opacity:1;background:linear-gradient(transparent 65%,#0008)}.ov .sv{display:none}}
+.loader{display:grid;place-items:center;height:80px}.loader span{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--acc);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+[hidden]{display:none!important}
+.chead{display:flex;align-items:center;gap:12px;margin-bottom:20px}.chead h2{font-size:30px}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.cc{position:relative;text-align:left;border-radius:22px;overflow:hidden;background:var(--sf);border:1px solid var(--line);transition:.25s}
+.cc:hover{transform:translateY(-4px);box-shadow:var(--sh)}
+.cc .cv{height:170px;background:linear-gradient(135deg,var(--acc),var(--acc2)) center/cover}
+.cc div.t{padding:14px 16px}.cc h3{font-size:18px}.cc span{color:var(--mute);font-size:13px}
+.cc .del{position:absolute;top:10px;right:10px;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#fff;color:#c0264b}
+.empty{padding:48px 16px;text-align:center;color:var(--mute)}
+dialog{border:0;padding:0;border-radius:26px;background:var(--sf);color:var(--ink);box-shadow:0 40px 90px -20px #0009;max-width:min(980px,94vw);width:100%}
+dialog[open]{animation:pop .35s cubic-bezier(.2,.8,.2,1)}dialog::backdrop{background:#0d0a2399;backdrop-filter:blur(6px)}
+@keyframes pop{from{opacity:0;transform:translateY(20px) scale(.96)}}
+#box[open]{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr);max-height:92vh;overflow:hidden}
+.stage{position:relative;display:grid;place-items:center;min-height:300px;background:color-mix(in srgb,var(--ink) 7%,var(--sf))}
+.stage img{max-width:100%;max-height:92vh;object-fit:contain;animation:fade .35s}
+@keyframes fade{from{opacity:0}}
+.nv{position:absolute;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--sf);color:var(--ink);box-shadow:var(--sh);transition:transform .2s}
+.nv:hover{transform:translateY(-50%) scale(1.1)}.nv.p{left:12px}.nv.n{right:12px}
+.side{padding:28px;display:flex;flex-direction:column;gap:14px;overflow:auto}.side h2{font-size:24px;line-height:1.2}.side h3{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:16px}
+.side .row{flex-wrap:wrap}.mute{color:var(--mute)}
+.tags{display:flex;flex-wrap:wrap;gap:8px}.tags button{padding:6px 14px;border-radius:99px;background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);font-weight:600;text-transform:capitalize;animation:pop .4s both}
+.x{position:absolute;top:14px;right:14px;z-index:2;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--sf);box-shadow:var(--sh)}
+#sv{max-width:420px;padding:24px}#sv header{display:flex;justify-content:space-between;align-items:center}#sv h2{font-size:22px}
+#sv ul{list-style:none;padding:0;margin:14px 0;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto}
+#sv li button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:14px;text-align:left;transition:.2s}
+#sv li button:hover{background:var(--bg)}#sv li button span{flex:1}#sv li button em{font-style:normal;color:var(--mute);font-size:13px}#sv li button.on{color:var(--acc)}
+#sv form{display:flex;gap:8px}#sv input{flex:1;min-width:0;padding:0 14px;height:42px;border-radius:99px;border:1px solid var(--line);background:var(--bg);outline:0}
+#toast{position:fixed;left:50%;bottom:28px;z-index:99;padding:12px 20px;border-radius:99px;background:var(--ink);color:var(--bg);font-weight:500;transform:translate(-50%,120px);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+#toast.on{transform:translate(-50%,0)}
+@media(max-width:760px){.ib span{display:none}.logo span{display:none}#box[open]{grid-template-columns:1fr;overflow:auto}.stage img{max-height:52vh}dialog{max-width:100vw;margin:auto 0 0;border-radius:26px 26px 0 0}}
+@media(max-width:560px){.top{flex-wrap:wrap}#sf{order:3;flex:1 1 100%;max-width:none}.nav{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/><path d="M19 3v4M21 5h-4"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></symbol>
+<symbol id="i-cl" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-cr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+</defs></svg>
+
+<header class="top">
+  <div class="logo"><b><svg class="i"><use href="#i-sparkles"/></svg></b><span>Lumo</span></div>
+  <form id="sf" role="search"><svg class="i"><use href="#i-search"/></svg><input id="q" placeholder="Search images, ideas, places…" aria-label="Search images" autocomplete="off"></form>
+  <nav class="nav">
+    <button class="ib on" id="nh" aria-label="Home"><svg class="i"><use href="#i-home"/></svg><span>Home</span></button>
+    <button class="ib" id="nc" aria-label="Collections"><svg class="i"><use href="#i-folder"/></svg><span>Collections</span></button>
+    <button class="ib" id="th" aria-label="Toggle theme"><svg class="i"><use href="#i-moon"/></svg></button>
+  </nav>
+</header>
+
+<section id="hero">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <h1>Find images worth keeping</h1>
+  <p>Search millions of photos, save them to collections and let AI describe what's inside.</p>
+</section>
+<nav id="cats" aria-label="Categories"></nav>
+
+<main>
+  <div id="cv" hidden></div>
+  <p id="empty" class="empty" hidden></p>
+  <div id="grid" class="grid"></div>
+  <div id="loader" class="loader"><span></span></div>
+  <div id="sent"></div>
+</main>
+
+<dialog id="box"></dialog>
+<dialog id="sv">
+  <header><h2>Save to collection</h2><button class="rb" type="button" aria-label="Close" onclick="this.closest('dialog').close()"><svg class="i"><use href="#i-x"/></svg></button></header>
+  <ul></ul>
+  <form><input name="n" placeholder="New collection name" aria-label="New collection name"><button class="btn">Create</button></form>
+</dialog>
+<div id="toast" role="status"></div>
+
+<script>
+const KEY = ''; // Paste your free Pexels API key here (pexels.com/api) for live search
+const CATS = ['All','Nature','Architecture','Travel','Food','Fashion','Technology','Animals','Art','Interior'];
+const $ = s => document.querySelector(s);
+const ic = n => `<svg class="i"><use href="#i-${n}"/></svg>`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S = {q:'', cat:'All', busy:false, end:false, view:'home', pins:[], list:[], tok:0, off:{}, n:0, seen:new Set(), idx:-1};
+let DB; try { DB = JSON.parse(localStorage.getItem('lumo')) } catch {} DB = DB || {c:[]};
+const persist = () => { try { localStorage.setItem('lumo', JSON.stringify(DB)) } catch {} };
+let toastT; const toast = m => { const t=$('#toast'); t.textContent=m; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2400) };
+
+/* ---------- Data: Pexels (with key) or Wikimedia Commons (no key, endless paging) ---------- */
+const SEEDS = ['landscape','city skyline','flowers','architecture','food','wildlife','mountains','street','sunset','ocean','forest','interior design','art','travel'];
+async function pexels(q, o) {
+  const r = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=30&page=${o+1}`, {headers:{Authorization:KEY}});
+  if (!r.ok) throw 0; const d = await r.json();
+  return {items:d.photos.map(p => ({id:'p'+p.id, src:p.src.large, full:p.src.original, w:p.width, h:p.height, by:p.photographer, alt:p.alt||'', page:p.url})), next:d.next_page ? o+1 : null};
+}
+async function wiki(q, o) {
+  const u = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=30&gsroffset=' + o +
+    '&gsrsearch=' + encodeURIComponent(q + ' filemime:image/jpeg') + '&prop=imageinfo&iiprop=url|size|extmetadata&iiurlwidth=800';
+  const r = await fetch(u); if (!r.ok) throw 0; const d = await r.json();
+  const pages = Object.values((d.query && d.query.pages) || {}).sort((a, b) => a.index - b.index);
+  const items = pages.map(p => { const i = p.imageinfo && p.imageinfo[0]; if (!i || !i.thumburl) return null;
+    const w = i.thumbwidth || i.width, h = i.thumbheight || i.height; if (w < 400 || h / w > 2.6 || h / w < .35) return null;
+    const a = i.extmetadata && i.extmetadata.Artist; const by = (a ? a.value.replace(/<[^>]*>/g, '').trim() : '').slice(0, 40) || 'Wikimedia Commons';
+    return {id:'w'+p.pageid, src:i.thumburl, full:i.url, w, h, by, alt:p.title.replace(/^File:/, '').replace(/\.\w+$/, '').replace(/_/g, ' '), page:i.descriptionurl} }).filter(Boolean);
+  return {items, next:d.continue ? d.continue.gsroffset : null};
+}
+function pick() {
+  if (S.q || S.cat !== 'All') return S.q || S.cat;
+  for (let i = 0; i < SEEDS.length; i++) { const q = SEEDS[S.n++ % SEEDS.length]; if (S.off[q] !== -1) return q }
+  return null;
+}
+async function load() {
+  if (S.busy || S.end || S.view !== 'home') return;
+  const tok = S.tok, q = pick(); if (!q) { S.end = true; return }
+  S.busy = true; $('#loader').hidden = false; let ok = true;
+  try {
+    const r = await (KEY ? pexels : wiki)(q, S.off[q] || 0);
+    if (tok !== S.tok) return;
+    S.off[q] = r.next == null ? -1 : r.next;
+    if (r.next == null && (S.q || S.cat !== 'All')) S.end = true;
+    const fresh = r.items.filter(p => !S.seen.has(p.id)); fresh.forEach(p => S.seen.add(p.id));
+    S.pins.push(...fresh); place(fresh);
+    if (!S.pins.length && S.end) { const e = $('#empty'); e.textContent = 'No images found for “' + q + '”. Try a different keyword.'; e.hidden = false }
+  } catch { ok = false; if (tok === S.tok) toast('Could not load images. Check your connection and try again.') }
+  finally { if (tok === S.tok) { S.busy = false; $('#loader').hidden = true; if (ok) setTimeout(check, 250) } }
+}
+function check() { if (!S.end && !S.busy && S.view === 'home' && $('#sent').getBoundingClientRect().top < innerHeight + 900) load() }
+
+/* ---------- Masonry grid ---------- */
+let cols = [], hs = [];
+function render(list) {
+  S.list = list; const g = $('#grid'); g.innerHTML = '';
+  const n = innerWidth > 1500 ? 6 : innerWidth > 1200 ? 5 : innerWidth > 900 ? 4 : innerWidth > 600 ? 3 : 2;
+  cols = []; hs = Array(n).fill(0);
+  for (let i = 0; i < n; i++) { const c = document.createElement('div'); c.className = 'col'; g.append(c); cols.push(c) }
+  place(list);
+}
+function place(list) { list.forEach(p => { const k = hs.indexOf(Math.min(...hs)); hs[k] += p.h/p.w; cols[k].append(card(p)) }) }
+function card(p) {
+  const a = document.createElement('article'); a.className = 'pin'; a.tabIndex = 0; a.style.aspectRatio = p.w + '/' + p.h;
+  a.innerHTML = `<img src="${p.src}" alt="${esc(p.alt || 'Photo by ' + p.by)}" loading="lazy" onload="this.classList.add('on')">
+  <div class="ov"><button class="btn sv" data-a="save">${ic('bookmark')}Save</button>
+  <div class="row"><span class="by">${esc(p.by)}</span><button class="rb" data-a="dl" aria-label="Download">${ic('download')}</button><button class="rb" data-a="sh" aria-label="Share">${ic('share')}</button></div></div>`;
+  a.onclick = e => { const b = e.target.closest('[data-a]'); b ? act(b.dataset.a, p) : openPin(p) };
+  a.onkeydown = e => { if (e.key === 'Enter' && e.target === a) openPin(p) };
+  return a;
+}
+
+/* ---------- Actions ---------- */
+const act = (a, p) => ({save:saveDlg, dl:download, sh:share})[a](p);
+async function download(p) {
+  try { const b = await (await fetch(p.full)).blob(), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'lumo-' + p.id + '.jpg'; a.click(); URL.revokeObjectURL(a.href); toast('Download started') }
+  catch { window.open(p.full, '_blank') }
+}
+async function share(p) {
+  const d = {title:'Lumo', text:'Photo by ' + p.by, url:p.page};
+  try { if (navigator.share) await navigator.share(d); else { await navigator.clipboard.writeText(p.page); toast('Link copied') } } catch {}
+}
+function saveDlg(p) {
+  const d = $('#sv'), ul = d.querySelector('ul');
+  const draw = () => ul.innerHTML = DB.c.map(c => { const on = c.pins.some(x => x.id === p.id);
+    return `<li><button data-id="${c.id}" class="${on?'on':''}">${ic('folder')}<span>${esc(c.name)}</span><em>${c.pins.length}</em>${on?ic('check'):''}</button></li>` }).join('') || '<li class="empty">No collections yet. Create your first one below.</li>';
+  draw();
+  ul.onclick = e => { const b = e.target.closest('button'); if (!b) return;
+    const c = DB.c.find(x => x.id === b.dataset.id), i = c.pins.findIndex(x => x.id === p.id);
+    i > -1 ? c.pins.splice(i, 1) : c.pins.push(p); persist(); draw(); toast(i > -1 ? 'Removed from ' + c.name : 'Saved to ' + c.name) };
+  d.querySelector('form').onsubmit = e => { e.preventDefault(); const f = e.target.n, n = f.value.trim(); if (!n) return;
+    DB.c.push({id:'c'+Date.now(), name:n, pins:[p]}); persist(); f.value = ''; draw(); toast('Saved to ' + n) };
+  d.showModal();
+}
+
+/* ---------- Lightbox + AI tagging (TensorFlow.js MobileNet, runs in the browser) ---------- */
+async function step(n) {
+  let t = S.list[S.idx + n];
+  if (!t && n > 0 && S.view === 'home') { await load(); t = S.list[S.idx + n] }
+  if (t) openPin(t);
+}
+function openPin(p) {
+  const d = $('#box'); S.idx = S.list.findIndex(x => x.id === p.id); const i = S.idx;
+  const hasP = i > 0, hasN = i > -1 && (i < S.list.length - 1 || (S.view === 'home' && !S.end));
+  d.innerHTML = `<button class="x" aria-label="Close" onclick="this.closest('dialog').close()">${ic('x')}</button>
+  <div class="stage"><img src="${p.src}" alt="${esc(p.alt || 'Photo by ' + p.by)}">
+  <button class="nv p" aria-label="Previous image" ${hasP ? '' : 'hidden'}>${ic('cl')}</button><button class="nv n" aria-label="Next image" ${hasN ? '' : 'hidden'}>${ic('cr')}</button></div>
+  <div class="side"><h2>${esc(p.alt || 'Photo by ' + p.by)}</h2><p class="mute">by ${esc(p.by)}</p>
+  <div class="row"><button class="btn" data-a="save">${ic('bookmark')}Save</button><button class="btn ghost" data-a="dl">${ic('download')}Download</button><button class="btn ghost" data-a="sh">${ic('share')}Share</button></div>
+  <h3>${ic('sparkles')}AI tags</h3><p class="mute" id="hint">Let AI detect what is in this image.</p><div id="tags" class="tags"></div>
+  <button class="btn ai" id="ai">${ic('sparkles')}Generate tags</button></div>`;
+  d.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(b.dataset.a, p));
+  d.querySelector('.nv.p').onclick = () => step(-1); d.querySelector('.nv.n').onclick = () => step(1);
+  $('#ai').onclick = () => aiTag(p);
+  if (!d.open) d.showModal();
+  [S.list[i + 1], S.list[i - 1]].forEach(x => { if (x) new Image().src = x.src });
+  if (S.view === 'home' && i > S.list.length - 5) load();
+}
+let net; const lib = u => new Promise((ok, no) => { const s = document.createElement('script'); s.src = u; s.onload = ok; s.onerror = no; document.head.append(s) });
+async function aiTag(p) {
+  const b = $('#ai'), t = $('#tags'); b.disabled = true; b.lastChild.textContent = 'Analyzing…';
+  try {
+    if (!net) { await lib('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0'); await lib('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1'); net = await mobilenet.load() }
+    const im = new Image(); im.crossOrigin = 'anonymous'; im.src = p.src; await im.decode();
+    const r = await net.classify(im, 5);
+    const tags = [...new Set(r.flatMap(x => x.className.split(',').map(s => s.trim())))].slice(0, 8);
+    t.innerHTML = tags.map(x => `<button>${esc(x)}</button>`).join(''); b.hidden = true; $('#hint').hidden = true;
+    t.onclick = e => { if (e.target.tagName === 'BUTTON') { $('#box').close(); go(e.target.textContent) } };
+  } catch { toast('AI tagging failed. Check your connection and try again.'); b.disabled = false; b.lastChild.textContent = 'Generate tags' }
+}
+
+/* ---------- Navigation: home, categories, collections ---------- */
+function chips() { $('#cats').innerHTML = CATS.map(c => `<button class="${c===S.cat&&!S.q?'on':''}">${c}</button>`).join('') }
+function home() {
+  S.view = 'home'; S.tok++; S.busy = false; S.end = false; S.pins = []; S.off = {}; S.n = 0; S.seen = new Set();
+  $('#empty').hidden = true; $('#cv').hidden = true; $('#grid').hidden = false; $('#hero').hidden = false; $('#cats').hidden = false;
+  $('#nh').classList.add('on'); $('#nc').classList.remove('on'); chips(); render([]); scrollTo({top:0}); load();
+}
+function go(q) { S.q = q; S.cat = 'All'; $('#q').value = q; home() }
+function cols_(id) {
+  S.view = 'cols'; $('#hero').hidden = true; $('#cats').hidden = true; $('#loader').hidden = true; $('#cv').hidden = false;
+  $('#nc').classList.add('on'); $('#nh').classList.remove('on'); scrollTo({top:0});
+  const cv = $('#cv'), c = DB.c.find(x => x.id === id);
+  if (c) {
+    $('#grid').hidden = false; S.view = 'col'; S.cur = id;
+    cv.innerHTML = `<div class="chead"><button class="rb" id="bk" aria-label="Back" style="background:var(--sf)">${ic('back')}</button><h2>${esc(c.name)}</h2><span class="mute">${c.pins.length} saved</span></div>` + (c.pins.length ? '' : '<p class="empty">Nothing here yet. Save images from Home to fill this collection.</p>');
+    $('#bk').onclick = () => cols_(); render(c.pins); return;
+  }
+  $('#grid').hidden = true;
+  cv.innerHTML = `<div class="chead"><h2>Your collections</h2></div>` + (DB.c.length ? `<div class="cg">${DB.c.map(c => `<div class="cc" data-id="${c.id}" tabindex="0" role="button"><div class="cv" style="${c.pins[0] ? `background-image:url('${c.pins[0].src}')` : ''}"></div><div class="t"><h3>${esc(c.name)}</h3><span>${c.pins.length} saved</span></div><button class="del" data-del="${c.id}" aria-label="Delete collection">${ic('trash')}</button></div>`).join('')}</div>` : '<p class="empty">No collections yet. Hover an image and press Save to create one.</p>');
+  cv.onclick = e => { const x = e.target.closest('[data-del]'); if (x) { DB.c = DB.c.filter(c => c.id !== x.dataset.del); persist(); return cols_() }
+    const k = e.target.closest('.cc'); if (k) cols_(k.dataset.id) };
+}
+
+/* ---------- Init ---------- */
+$('#cats').onclick = e => { if (e.target.tagName === 'BUTTON') { S.cat = e.target.textContent; S.q = ''; $('#q').value = ''; home() } };
+$('#sf').onsubmit = e => { e.preventDefault(); const q = $('#q').value.trim(); q ? go(q) : (S.q = '', home()) };
+$('#nh').onclick = () => { S.q = ''; S.cat = 'All'; $('#q').value = ''; home() };
+$('#nc').onclick = () => cols_();
+$('#th').onclick = () => { const r = document.documentElement, d = r.dataset.theme === 'dark'; r.dataset.theme = d ? 'light' : 'dark' };
+new IntersectionObserver(e => e[0].isIntersecting && load(), {rootMargin:'900px'}).observe($('#sent'));
+const bx = $('#box'); let tx = null;
+bx.addEventListener('keydown', e => { if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1) });
+bx.addEventListener('click', e => { if (e.target === bx) bx.close() });
+bx.addEventListener('touchstart', e => { tx = e.target.closest('.stage') ? e.touches[0].clientX : null }, {passive:true});
+bx.addEventListener('touchend', e => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 60) step(dx < 0 ? 1 : -1); tx = null });
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => S.view !== 'cols' && render(S.view === 'home' ? S.pins : (DB.c.find(c => c.id === S.cur) || {pins:[]}).pins), 200) });
+home();
+</script>
+</body>
+</html>
